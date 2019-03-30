@@ -30,43 +30,47 @@ private FirebaseModelInputOutputOptions mDataOptions;
 >***Nota:*** agregaremos el siguiente codigo dento del metodo `onCreate` al final del metodo.
 
 ```
-int[] inputDims = {DIM_BATCH_SIZE, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y, DIM_PIXEL_SIZE};
-int[] outputDims = {DIM_BATCH_SIZE, mLabelList.size()};
-try {
-    mDataOptions =
-            new FirebaseModelInputOutputOptions.Builder()
-                    .setInputFormat(0, FirebaseModelDataType.BYTE, inputDims)
-                    .setOutputFormat(0, FirebaseModelDataType.BYTE, outputDims)
-                    .build();
-    FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions
-            .Builder()
-            .requireWifi()
-            .build();
-    FirebaseLocalModelSource localModelSource =
-            new FirebaseLocalModelSource.Builder("asset")
-                    .setAssetFilePath(LOCAL_MODEL_ASSET).build();
+    private void initCustomModel() {
+        mLabelList = loadLabelList(this);
 
-    FirebaseCloudModelSource cloudSource = new FirebaseCloudModelSource.Builder
-            (HOSTED_MODEL_NAME)
-            .enableModelUpdates(true)
-            .setInitialDownloadConditions(conditions)
-            .setUpdatesDownloadConditions(conditions)  // You could also specify
-            // different conditions
-            // for updates
-            .build();
-    FirebaseModelManager manager = FirebaseModelManager.getInstance();
-    manager.registerLocalModelSource(localModelSource);
-    manager.registerCloudModelSource(cloudSource);
-    FirebaseModelOptions modelOptions =
-            new FirebaseModelOptions.Builder()
-                    .setCloudModelName(HOSTED_MODEL_NAME)
-                    .setLocalModelName("asset")
+        int[] inputDims = {DIM_BATCH_SIZE, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y, DIM_PIXEL_SIZE};
+        int[] outputDims = {DIM_BATCH_SIZE, mLabelList.size()};
+        try {
+            mDataOptions =
+                    new FirebaseModelInputOutputOptions.Builder()
+                            .setInputFormat(0, FirebaseModelDataType.BYTE, inputDims)
+                            .setOutputFormat(0, FirebaseModelDataType.BYTE, outputDims)
+                            .build();
+            FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions
+                    .Builder()
+                    .requireWifi()
                     .build();
-    mInterpreter = FirebaseModelInterpreter.getInstance(modelOptions);
-} catch (FirebaseMLException e) {
-    showToast("Error while setting up the model");
-    e.printStackTrace();
-}
+            FirebaseLocalModelSource localSource =
+                    new FirebaseLocalModelSource.Builder("asset")
+                            .setAssetFilePath(LOCAL_MODEL_ASSET).build();
+
+            FirebaseCloudModelSource cloudSource = new FirebaseCloudModelSource.Builder
+                    (HOSTED_MODEL_NAME)
+                    .enableModelUpdates(true)
+                    .setInitialDownloadConditions(conditions)
+                    .setUpdatesDownloadConditions(conditions)  // You could also specify
+                    // different conditions
+                    // for updates
+                    .build();
+            FirebaseModelManager manager = FirebaseModelManager.getInstance();
+            manager.registerLocalModelSource(localSource);
+            manager.registerCloudModelSource(cloudSource);
+            FirebaseModelOptions modelOptions =
+                    new FirebaseModelOptions.Builder()
+                            .setCloudModelName(HOSTED_MODEL_NAME)
+                            .setLocalModelName("asset")
+                            .build();
+            mInterpreter = FirebaseModelInterpreter.getInstance(modelOptions);
+        } catch (FirebaseMLException e) {
+            showToast("Error while setting up the model");
+            e.printStackTrace();
+        }
+    }
 ```
 
 ### remplazar el codigo
