@@ -72,4 +72,4 @@ private void processFaceContourDetectionResult(List<FirebaseVisionFace> faces) {
 ```
 
 ## Próximo modulo
-Avanzar al [deteccion de objetos](../06-findObjects)
+Avanzar al [deteccion de objetos](../06-FindObjects)
